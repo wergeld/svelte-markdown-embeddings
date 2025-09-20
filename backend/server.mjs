@@ -140,55 +140,26 @@ app.post('/api/chat', async (req, res) => {
     const rows = db.prepare('SELECT id, title, content, embedding FROM documents').all();
 
     // 3. Compute similarity and get top K
-    // const scored = rows.map(r => {
-    //   const emb = JSON.parse(r.embedding);
-    //   return { id: r.id, title: r.title, content: r.content, score: cosineSimilarity(emb, qEmb) };
-    // }).sort((a,b) => b.score - a.score).slice(0, topK);
     const scored = rows.map((row) => ({
       id: row.id,
+      title: row.title,
       content: row.content,
       score: cosineSimilarity(qEmb, JSON.parse(row.embedding))
     }));
     const topDocs = scored.sort((a, b) => b.score - a.score).slice(0, topK);
-
-    // 4. Construct prompt for LLM
-//     let contextText = scored.map(r => `Title: ${r.title}\nContent: ${r.content}`).join('\n\n');
-//     const prompt = `
-// You are a helpful assistant. Use the following notes to answer the question.
-// Question: ${question}
-
-// Notes:
-// ${contextText}
-
-// Answer concisely:
-// `;
-    const docsSection = topDocs
-      .map(d => `Document ${d.id}:\n${d.content}`)
-      .join('\n\n');
+  
+    let contextText = topDocs.map(d => `DOC_ID:${d.id} TITLE:${d.title}\n${d.content}`).join('\n\n');
 
     const prompt = `
-  You are an AI assistant. Answer the user’s question using ONLY the provided documents. 
-  If the answer is not contained in the documents, say "I don’t know."
+You are an assistant. Answer the question using ONLY the provided documents.
+Indicate the DOC_IDs you used in your answer, e.g., "Used DOC_ID: 3 TITLE: My Document" for reference.
 
-  For each answer, list the document ID(s) that support your response.
+Context:
+${contextText}
 
-  ---
-  User question:
-  ${question}
+Question: ${question}
+`;
 
-  ---
-  Relevant documents:
-  ${docsSection}
-
-  ---
-  Answer in the following format:
-
-  Answer:
-  [Your concise answer here]
-
-  Sources:
-  [List of document IDs that contain the answer]
-  `;
 
     // 5. Send prompt to Ollama LLM
     const resp = await axios.post('http://localhost:11434/api/chat', {
@@ -206,8 +177,13 @@ app.post('/api/chat', async (req, res) => {
     console.log(prompt);
     console.log(resp.data);
 
-    const answer = resp.data?.message.content || 'No response';
-    res.json({ answer, sources: scored.map(r => ({ id: r.id, title: r.title, score: r.score })) });
+    const response = resp.data?.message.content || 'No response';
+    //res.json({ answer, sources: scored.map(r => ({ id: r.id, title: r.title, score: r.score })) });
+    // Return both answer and the doc IDs
+    res.json({
+      answer: response, // or response.data.choices[0].text depending on Ollama API
+      docIds: topDocs.map(d => ({ id: d.id, title: d.title }))
+    });
 
   } catch (err) {
     console.error(err);

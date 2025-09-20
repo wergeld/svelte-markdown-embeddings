@@ -4081,3 +4081,6 @@ frontend/node_modules/ws/lib/stream.js
 frontend/node_modules/ws/lib/validation.js
 frontend/node_modules/ws/lib/websocket-server.js
 frontend/node_modules/ws/lib/websocket.js
+frontend/public/build/bundle.css
+frontend/public/build/bundle.js
+frontend/public/build/bundle.js.map

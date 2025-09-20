@@ -336,6 +336,20 @@ var app = (function () {
 		get_current_component().$$.on_mount.push(fn);
 	}
 
+	/**
+	 * Schedules a callback to run immediately before the component is unmounted.
+	 *
+	 * Out of `onMount`, `beforeUpdate`, `afterUpdate` and `onDestroy`, this is the
+	 * only one that runs inside a server-side component.
+	 *
+	 * https://svelte.dev/docs/svelte#ondestroy
+	 * @param {() => any} fn
+	 * @returns {void}
+	 */
+	function onDestroy(fn) {
+		get_current_component().$$.on_destroy.push(fn);
+	}
+
 	const dirty_components = [];
 	const binding_callbacks = [];
 
@@ -5473,30 +5487,35 @@ var app = (function () {
 
 	function get_each_context(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[31] = list[i];
-		child_ctx[33] = i;
+		child_ctx[44] = list[i];
 		return child_ctx;
 	}
 
 	function get_each_context_1(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[34] = list[i];
+		child_ctx[47] = list[i];
 		return child_ctx;
 	}
 
 	function get_each_context_2(ctx, list, i) {
 		const child_ctx = ctx.slice();
-		child_ctx[37] = list[i];
+		child_ctx[50] = list[i];
 		return child_ctx;
 	}
 
-	// (173:6) {#if activeTab==='all'}
-	function create_if_block_4(ctx) {
+	function get_each_context_3(ctx, list, i) {
+		const child_ctx = ctx.slice();
+		child_ctx[47] = list[i];
+		return child_ctx;
+	}
+
+	// (268:8) {#if activeTab==='all'}
+	function create_if_block_5(ctx) {
 		let if_block_anchor;
 
 		function select_block_type(ctx, dirty) {
-			if (/*docs*/ ctx[3].length === 0) return create_if_block_5;
-			return create_else_block_1;
+			if (/*docs*/ ctx[2].length === 0) return create_if_block_6;
+			return create_else_block_2;
 		}
 
 		let current_block_type = select_block_type(ctx);
@@ -5535,23 +5554,23 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_4.name,
+			id: create_if_block_5.name,
 			type: "if",
-			source: "(173:6) {#if activeTab==='all'}",
+			source: "(268:8) {#if activeTab==='all'}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (178:8) {:else}
-	function create_else_block_1(ctx) {
+	// (271:10) {:else}
+	function create_else_block_2(ctx) {
 		let ul;
-		let each_value_2 = ensure_array_like_dev(/*docs*/ ctx[3].sort(func));
+		let each_value_3 = ensure_array_like_dev(/*docs*/ ctx[2].sort(func));
 		let each_blocks = [];
 
-		for (let i = 0; i < each_value_2.length; i += 1) {
-			each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
+		for (let i = 0; i < each_value_3.length; i += 1) {
+			each_blocks[i] = create_each_block_3(get_each_context_3(ctx, each_value_3, i));
 		}
 
 		const block = {
@@ -5562,8 +5581,8 @@ var app = (function () {
 					each_blocks[i].c();
 				}
 
-				attr_dev(ul, "class", "list-group flex-grow-1 overflow-auto svelte-1o218rd");
-				add_location(ul, file, 178, 10, 5767);
+				attr_dev(ul, "class", "list-group flex-grow-1 overflow-auto min-0 svelte-nbi03a");
+				add_location(ul, file, 271, 12, 8794);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, ul, anchor);
@@ -5575,17 +5594,17 @@ var app = (function () {
 				}
 			},
 			p: function update(ctx, dirty) {
-				if (dirty[0] & /*darkMode, deleteDoc, docs, editDoc*/ 6168) {
-					each_value_2 = ensure_array_like_dev(/*docs*/ ctx[3].sort(func));
+				if (dirty[0] & /*darkMode, deleteDoc, docs, editDoc*/ 24596) {
+					each_value_3 = ensure_array_like_dev(/*docs*/ ctx[2].sort(func));
 					let i;
 
-					for (i = 0; i < each_value_2.length; i += 1) {
-						const child_ctx = get_each_context_2(ctx, each_value_2, i);
+					for (i = 0; i < each_value_3.length; i += 1) {
+						const child_ctx = get_each_context_3(ctx, each_value_3, i);
 
 						if (each_blocks[i]) {
 							each_blocks[i].p(child_ctx, dirty);
 						} else {
-							each_blocks[i] = create_each_block_2(child_ctx);
+							each_blocks[i] = create_each_block_3(child_ctx);
 							each_blocks[i].c();
 							each_blocks[i].m(ul, null);
 						}
@@ -5595,7 +5614,7 @@ var app = (function () {
 						each_blocks[i].d(1);
 					}
 
-					each_blocks.length = each_value_2.length;
+					each_blocks.length = each_value_3.length;
 				}
 			},
 			d: function destroy(detaching) {
@@ -5609,17 +5628,17 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_else_block_1.name,
+			id: create_else_block_2.name,
 			type: "else",
-			source: "(178:8) {:else}",
+			source: "(271:10) {:else}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (174:8) {#if docs.length === 0}
-	function create_if_block_5(ctx) {
+	// (269:10) {#if docs.length === 0}
+	function create_if_block_6(ctx) {
 		let div;
 
 		const block = {
@@ -5627,7 +5646,7 @@ var app = (function () {
 				div = element("div");
 				div.textContent = "No documents available. Save a document to get started.";
 				attr_dev(div, "class", "alert alert-info text-center");
-				add_location(div, file, 174, 10, 5613);
+				add_location(div, file, 269, 12, 8660);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -5642,26 +5661,26 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_5.name,
+			id: create_if_block_6.name,
 			type: "if",
-			source: "(174:8) {#if docs.length === 0}",
+			source: "(269:10) {#if docs.length === 0}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (180:12) {#each docs.sort((a,b)=>a.title.localeCompare(b.title)) as doc}
-	function create_each_block_2(ctx) {
+	// (273:14) {#each docs.sort((a,b)=>a.title.localeCompare(b.title)) as doc}
+	function create_each_block_3(ctx) {
 		let li;
 		let div;
 		let strong;
-		let t0_value = /*doc*/ ctx[37].title + "";
+		let t0_value = /*doc*/ ctx[47].title + "";
 		let t0;
 		let br;
 		let t1;
 		let small;
-		let t2_value = new Date(/*doc*/ ctx[37].lastModified).toLocaleString() + "";
+		let t2_value = new Date(/*doc*/ ctx[47].lastModified).toLocaleString() + "";
 		let t2;
 		let t3;
 		let span;
@@ -5675,11 +5694,11 @@ var app = (function () {
 		let dispose;
 
 		function click_handler_3() {
-			return /*click_handler_3*/ ctx[19](/*doc*/ ctx[37]);
+			return /*click_handler_3*/ ctx[24](/*doc*/ ctx[47]);
 		}
 
 		function click_handler_4() {
-			return /*click_handler_4*/ ctx[20](/*doc*/ ctx[37]);
+			return /*click_handler_4*/ ctx[25](/*doc*/ ctx[47]);
 		}
 
 		const block = {
@@ -5700,27 +5719,27 @@ var app = (function () {
 				button1 = element("button");
 				i1 = element("i");
 				t5 = space();
-				add_location(strong, file, 183, 18, 6097);
-				add_location(br, file, 183, 46, 6125);
+				add_location(strong, file, 276, 20, 9140);
+				add_location(br, file, 276, 48, 9168);
 				attr_dev(small, "class", "last-modified");
 				toggle_class(small, "text-light", /*darkMode*/ ctx[4]);
-				add_location(small, file, 184, 18, 6148);
-				add_location(div, file, 182, 16, 6073);
+				add_location(small, file, 277, 20, 9193);
+				add_location(div, file, 275, 18, 9114);
 				attr_dev(i0, "class", "bi bi-pencil-fill");
-				add_location(i0, file, 190, 20, 6477);
+				add_location(i0, file, 281, 22, 9490);
 				attr_dev(button0, "class", "btn btn-sm btn-outline-primary me-1");
 				attr_dev(button0, "title", "Edit");
-				add_location(button0, file, 189, 18, 6363);
+				add_location(button0, file, 280, 20, 9374);
 				attr_dev(i1, "class", "bi bi-trash-fill");
-				add_location(i1, file, 193, 20, 6669);
+				add_location(i1, file, 284, 22, 9688);
 				attr_dev(button1, "class", "btn btn-sm btn-outline-danger");
 				attr_dev(button1, "title", "Delete");
-				add_location(button1, file, 192, 18, 6557);
-				add_location(span, file, 188, 16, 6338);
+				add_location(button1, file, 283, 20, 9574);
+				add_location(span, file, 279, 18, 9347);
 				attr_dev(li, "class", "list-group-item d-flex justify-content-between align-items-center");
 				toggle_class(li, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(li, "text-light", /*darkMode*/ ctx[4]);
-				add_location(li, file, 180, 14, 5907);
+				add_location(li, file, 273, 16, 8944);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, li, anchor);
@@ -5751,8 +5770,8 @@ var app = (function () {
 			},
 			p: function update(new_ctx, dirty) {
 				ctx = new_ctx;
-				if (dirty[0] & /*docs*/ 8 && t0_value !== (t0_value = /*doc*/ ctx[37].title + "")) set_data_dev(t0, t0_value);
-				if (dirty[0] & /*docs*/ 8 && t2_value !== (t2_value = new Date(/*doc*/ ctx[37].lastModified).toLocaleString() + "")) set_data_dev(t2, t2_value);
+				if (dirty[0] & /*docs*/ 4 && t0_value !== (t0_value = /*doc*/ ctx[47].title + "")) set_data_dev(t0, t0_value);
+				if (dirty[0] & /*docs*/ 4 && t2_value !== (t2_value = new Date(/*doc*/ ctx[47].lastModified).toLocaleString() + "")) set_data_dev(t2, t2_value);
 
 				if (dirty[0] & /*darkMode*/ 16) {
 					toggle_class(small, "text-light", /*darkMode*/ ctx[4]);
@@ -5778,22 +5797,22 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_each_block_2.name,
+			id: create_each_block_3.name,
 			type: "each",
-			source: "(180:12) {#each docs.sort((a,b)=>a.title.localeCompare(b.title)) as doc}",
+			source: "(273:14) {#each docs.sort((a,b)=>a.title.localeCompare(b.title)) as doc}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (204:6) {#if activeTab==='search'}
-	function create_if_block_2(ctx) {
+	// (295:8) {#if activeTab==='search'}
+	function create_if_block_3(ctx) {
 		let if_block_anchor;
 
 		function select_block_type_1(ctx, dirty) {
-			if (/*searchResults*/ ctx[6].length === 0) return create_if_block_3;
-			return create_else_block;
+			if (/*searchResults*/ ctx[6].length === 0) return create_if_block_4;
+			return create_else_block_1;
 		}
 
 		let current_block_type = select_block_type_1(ctx);
@@ -5832,23 +5851,23 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_2.name,
+			id: create_if_block_3.name,
 			type: "if",
-			source: "(204:6) {#if activeTab==='search'}",
+			source: "(295:8) {#if activeTab==='search'}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (209:8) {:else}
-	function create_else_block(ctx) {
+	// (298:10) {:else}
+	function create_else_block_1(ctx) {
 		let ul;
-		let each_value_1 = ensure_array_like_dev(/*searchResults*/ ctx[6]);
+		let each_value_2 = ensure_array_like_dev(/*searchResults*/ ctx[6]);
 		let each_blocks = [];
 
-		for (let i = 0; i < each_value_1.length; i += 1) {
-			each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+		for (let i = 0; i < each_value_2.length; i += 1) {
+			each_blocks[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
 		}
 
 		const block = {
@@ -5859,8 +5878,8 @@ var app = (function () {
 					each_blocks[i].c();
 				}
 
-				attr_dev(ul, "class", "list-group flex-grow-1 overflow-auto svelte-1o218rd");
-				add_location(ul, file, 209, 10, 7072);
+				attr_dev(ul, "class", "list-group flex-grow-1 overflow-auto min-0 svelte-nbi03a");
+				add_location(ul, file, 298, 12, 10089);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, ul, anchor);
@@ -5872,17 +5891,17 @@ var app = (function () {
 				}
 			},
 			p: function update(ctx, dirty) {
-				if (dirty[0] & /*darkMode, editDoc, searchResults*/ 2128) {
-					each_value_1 = ensure_array_like_dev(/*searchResults*/ ctx[6]);
+				if (dirty[0] & /*darkMode, editDoc, searchResults*/ 8272) {
+					each_value_2 = ensure_array_like_dev(/*searchResults*/ ctx[6]);
 					let i;
 
-					for (i = 0; i < each_value_1.length; i += 1) {
-						const child_ctx = get_each_context_1(ctx, each_value_1, i);
+					for (i = 0; i < each_value_2.length; i += 1) {
+						const child_ctx = get_each_context_2(ctx, each_value_2, i);
 
 						if (each_blocks[i]) {
 							each_blocks[i].p(child_ctx, dirty);
 						} else {
-							each_blocks[i] = create_each_block_1(child_ctx);
+							each_blocks[i] = create_each_block_2(child_ctx);
 							each_blocks[i].c();
 							each_blocks[i].m(ul, null);
 						}
@@ -5892,7 +5911,7 @@ var app = (function () {
 						each_blocks[i].d(1);
 					}
 
-					each_blocks.length = each_value_1.length;
+					each_blocks.length = each_value_2.length;
 				}
 			},
 			d: function destroy(detaching) {
@@ -5906,17 +5925,17 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_else_block.name,
+			id: create_else_block_1.name,
 			type: "else",
-			source: "(209:8) {:else}",
+			source: "(298:10) {:else}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (205:8) {#if searchResults.length === 0}
-	function create_if_block_3(ctx) {
+	// (296:10) {#if searchResults.length === 0}
+	function create_if_block_4(ctx) {
 		let div;
 
 		const block = {
@@ -5924,7 +5943,7 @@ var app = (function () {
 				div = element("div");
 				div.textContent = "No search results.";
 				attr_dev(div, "class", "alert alert-info text-center");
-				add_location(div, file, 205, 10, 6955);
+				add_location(div, file, 296, 12, 9992);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -5939,27 +5958,27 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_3.name,
+			id: create_if_block_4.name,
 			type: "if",
-			source: "(205:8) {#if searchResults.length === 0}",
+			source: "(296:10) {#if searchResults.length === 0}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (211:12) {#each searchResults as r}
-	function create_each_block_1(ctx) {
+	// (300:14) {#each searchResults as r}
+	function create_each_block_2(ctx) {
 		let li;
 		let div;
 		let strong;
-		let t0_value = /*r*/ ctx[34].title + "";
+		let t0_value = /*r*/ ctx[50].title + "";
 		let t0;
 		let br;
 		let t1;
 		let small;
 		let t2;
-		let t3_value = /*r*/ ctx[34].score.toFixed(3) + "";
+		let t3_value = /*r*/ ctx[50].score.toFixed(3) + "";
 		let t3;
 		let t4;
 		let span;
@@ -5970,7 +5989,7 @@ var app = (function () {
 		let dispose;
 
 		function click_handler_5() {
-			return /*click_handler_5*/ ctx[21](/*r*/ ctx[34]);
+			return /*click_handler_5*/ ctx[26](/*r*/ ctx[50]);
 		}
 
 		const block = {
@@ -5989,22 +6008,22 @@ var app = (function () {
 				button = element("button");
 				i = element("i");
 				t5 = space();
-				add_location(strong, file, 214, 18, 7365);
-				add_location(br, file, 214, 44, 7391);
+				add_location(strong, file, 303, 20, 10398);
+				add_location(br, file, 303, 46, 10424);
 				attr_dev(small, "class", "score-text");
 				toggle_class(small, "text-light", /*darkMode*/ ctx[4]);
-				add_location(small, file, 215, 18, 7414);
-				add_location(div, file, 213, 16, 7341);
+				add_location(small, file, 304, 20, 10449);
+				add_location(div, file, 302, 18, 10372);
 				attr_dev(i, "class", "bi bi-pencil-fill");
-				add_location(i, file, 221, 20, 7715);
+				add_location(i, file, 308, 22, 10718);
 				attr_dev(button, "class", "btn btn-sm btn-outline-primary");
 				attr_dev(button, "title", "Edit");
-				add_location(button, file, 220, 18, 7608);
-				add_location(span, file, 219, 16, 7583);
+				add_location(button, file, 307, 20, 10609);
+				add_location(span, file, 306, 18, 10582);
 				attr_dev(li, "class", "list-group-item d-flex justify-content-between align-items-center");
 				toggle_class(li, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(li, "text-light", /*darkMode*/ ctx[4]);
-				add_location(li, file, 211, 14, 7175);
+				add_location(li, file, 300, 16, 10202);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, li, anchor);
@@ -6029,8 +6048,8 @@ var app = (function () {
 			},
 			p: function update(new_ctx, dirty) {
 				ctx = new_ctx;
-				if (dirty[0] & /*searchResults*/ 64 && t0_value !== (t0_value = /*r*/ ctx[34].title + "")) set_data_dev(t0, t0_value);
-				if (dirty[0] & /*searchResults*/ 64 && t3_value !== (t3_value = /*r*/ ctx[34].score.toFixed(3) + "")) set_data_dev(t3, t3_value);
+				if (dirty[0] & /*searchResults*/ 64 && t0_value !== (t0_value = /*r*/ ctx[50].title + "")) set_data_dev(t0, t0_value);
+				if (dirty[0] & /*searchResults*/ 64 && t3_value !== (t3_value = /*r*/ ctx[50].score.toFixed(3) + "")) set_data_dev(t3, t3_value);
 
 				if (dirty[0] & /*darkMode*/ 16) {
 					toggle_class(small, "text-light", /*darkMode*/ ctx[4]);
@@ -6056,63 +6075,32 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_each_block_1.name,
+			id: create_each_block_2.name,
 			type: "each",
-			source: "(211:12) {#each searchResults as r}",
+			source: "(300:14) {#each searchResults as r}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (294:45) 
-	function create_if_block_1(ctx) {
+	// (328:8) {#if dirty}
+	function create_if_block_2(ctx) {
 		let div;
-		let strong;
-		let t1;
-		let html_tag;
-		let raw_value = marked.parse(/*c*/ ctx[31].text) + "";
+		let small;
 
 		const block = {
 			c: function create() {
 				div = element("div");
-				strong = element("strong");
-				strong.textContent = "Assistant:";
-				t1 = space();
-				html_tag = new HtmlTag(false);
-				add_location(strong, file, 302, 16, 10559);
-				html_tag.a = null;
-				attr_dev(div, "class", "p-2 border rounded d-inline-block");
-				toggle_class(div, "bg-light", !/*darkMode*/ ctx[4]);
-				toggle_class(div, "text-dark", !/*darkMode*/ ctx[4]);
-				toggle_class(div, "bg-secondary", /*darkMode*/ ctx[4]);
-				toggle_class(div, "text-light", /*darkMode*/ ctx[4]);
-				add_location(div, file, 295, 14, 10287);
+				small = element("small");
+				small.textContent = "⚠ Unsaved changes…";
+				add_location(small, file, 328, 41, 11470);
+				attr_dev(div, "class", "text-warning mt-1");
+				add_location(div, file, 328, 10, 11439);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
-				append_dev(div, strong);
-				append_dev(div, t1);
-				html_tag.m(raw_value, div);
-			},
-			p: function update(ctx, dirty) {
-				if (dirty[0] & /*chatMessages*/ 512 && raw_value !== (raw_value = marked.parse(/*c*/ ctx[31].text) + "")) html_tag.p(raw_value);
-
-				if (dirty[0] & /*darkMode*/ 16) {
-					toggle_class(div, "bg-light", !/*darkMode*/ ctx[4]);
-				}
-
-				if (dirty[0] & /*darkMode*/ 16) {
-					toggle_class(div, "text-dark", !/*darkMode*/ ctx[4]);
-				}
-
-				if (dirty[0] & /*darkMode*/ 16) {
-					toggle_class(div, "bg-secondary", /*darkMode*/ ctx[4]);
-				}
-
-				if (dirty[0] & /*darkMode*/ 16) {
-					toggle_class(div, "text-light", /*darkMode*/ ctx[4]);
-				}
+				append_dev(div, small);
 			},
 			d: function destroy(detaching) {
 				if (detaching) {
@@ -6123,21 +6111,89 @@ var app = (function () {
 
 		dispatch_dev("SvelteRegisterBlock", {
 			block,
-			id: create_if_block_1.name,
+			id: create_if_block_2.name,
 			type: "if",
-			source: "(294:45) ",
+			source: "(328:8) {#if dirty}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (282:12) {#if c.role === 'user'}
+	// (369:14) {:else}
+	function create_else_block(ctx) {
+		let div;
+		let strong;
+		let t1;
+		let html_tag;
+		let raw_value = marked.parse(/*c*/ ctx[44].text) + "";
+		let t2;
+		let if_block = /*c*/ ctx[44].docIds?.length && create_if_block_1(ctx);
+
+		const block = {
+			c: function create() {
+				div = element("div");
+				strong = element("strong");
+				strong.textContent = "Assistant:";
+				t1 = space();
+				html_tag = new HtmlTag(false);
+				t2 = space();
+				if (if_block) if_block.c();
+				add_location(strong, file, 370, 18, 13528);
+				html_tag.a = t2;
+				attr_dev(div, "class", "p-2 border rounded d-inline-block ...");
+				add_location(div, file, 369, 16, 13458);
+			},
+			m: function mount(target, anchor) {
+				insert_dev(target, div, anchor);
+				append_dev(div, strong);
+				append_dev(div, t1);
+				html_tag.m(raw_value, div);
+				append_dev(div, t2);
+				if (if_block) if_block.m(div, null);
+			},
+			p: function update(ctx, dirty) {
+				if (dirty[0] & /*chatMessages*/ 1024 && raw_value !== (raw_value = marked.parse(/*c*/ ctx[44].text) + "")) html_tag.p(raw_value);
+
+				if (/*c*/ ctx[44].docIds?.length) {
+					if (if_block) {
+						if_block.p(ctx, dirty);
+					} else {
+						if_block = create_if_block_1(ctx);
+						if_block.c();
+						if_block.m(div, null);
+					}
+				} else if (if_block) {
+					if_block.d(1);
+					if_block = null;
+				}
+			},
+			d: function destroy(detaching) {
+				if (detaching) {
+					detach_dev(div);
+				}
+
+				if (if_block) if_block.d();
+			}
+		};
+
+		dispatch_dev("SvelteRegisterBlock", {
+			block,
+			id: create_else_block.name,
+			type: "else",
+			source: "(369:14) {:else}",
+			ctx
+		});
+
+		return block;
+	}
+
+	// (363:14) {#if c.role === 'user'}
 	function create_if_block(ctx) {
 		let div;
 		let strong;
 		let t1;
-		let t2_value = /*c*/ ctx[31].text + "";
+		let t2_value = /*c*/ ctx[44].text + "";
 		let t2;
 
 		const block = {
@@ -6147,13 +6203,13 @@ var app = (function () {
 				strong.textContent = "You:";
 				t1 = space();
 				t2 = text(t2_value);
-				add_location(strong, file, 290, 16, 10133);
+				add_location(strong, file, 366, 18, 13366);
 				attr_dev(div, "class", "p-2 border rounded d-inline-block");
 				toggle_class(div, "bg-primary", !/*darkMode*/ ctx[4]);
 				toggle_class(div, "text-white", !/*darkMode*/ ctx[4]);
 				toggle_class(div, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(div, "text-light", /*darkMode*/ ctx[4]);
-				add_location(div, file, 283, 14, 9863);
+				add_location(div, file, 363, 16, 13149);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
@@ -6162,7 +6218,7 @@ var app = (function () {
 				append_dev(div, t2);
 			},
 			p: function update(ctx, dirty) {
-				if (dirty[0] & /*chatMessages*/ 512 && t2_value !== (t2_value = /*c*/ ctx[31].text + "")) set_data_dev(t2, t2_value);
+				if (dirty[0] & /*chatMessages*/ 1024 && t2_value !== (t2_value = /*c*/ ctx[44].text + "")) set_data_dev(t2, t2_value);
 
 				if (dirty[0] & /*darkMode*/ 16) {
 					toggle_class(div, "bg-primary", !/*darkMode*/ ctx[4]);
@@ -6191,50 +6247,183 @@ var app = (function () {
 			block,
 			id: create_if_block.name,
 			type: "if",
-			source: "(282:12) {#if c.role === 'user'}",
+			source: "(363:14) {#if c.role === 'user'}",
 			ctx
 		});
 
 		return block;
 	}
 
-	// (279:8) {#each chatMessages as c, i}
+	// (372:20) {#if c.docIds?.length}
+	function create_if_block_1(ctx) {
+		let div;
+		let each_value_1 = ensure_array_like_dev(/*c*/ ctx[44].docIds);
+		let each_blocks = [];
+
+		for (let i = 0; i < each_value_1.length; i += 1) {
+			each_blocks[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+		}
+
+		const block = {
+			c: function create() {
+				div = element("div");
+
+				for (let i = 0; i < each_blocks.length; i += 1) {
+					each_blocks[i].c();
+				}
+
+				attr_dev(div, "class", "mt-1");
+				add_location(div, file, 372, 22, 13650);
+			},
+			m: function mount(target, anchor) {
+				insert_dev(target, div, anchor);
+
+				for (let i = 0; i < each_blocks.length; i += 1) {
+					if (each_blocks[i]) {
+						each_blocks[i].m(div, null);
+					}
+				}
+			},
+			p: function update(ctx, dirty) {
+				if (dirty[0] & /*openDocById, chatMessages*/ 132096) {
+					each_value_1 = ensure_array_like_dev(/*c*/ ctx[44].docIds);
+					let i;
+
+					for (i = 0; i < each_value_1.length; i += 1) {
+						const child_ctx = get_each_context_1(ctx, each_value_1, i);
+
+						if (each_blocks[i]) {
+							each_blocks[i].p(child_ctx, dirty);
+						} else {
+							each_blocks[i] = create_each_block_1(child_ctx);
+							each_blocks[i].c();
+							each_blocks[i].m(div, null);
+						}
+					}
+
+					for (; i < each_blocks.length; i += 1) {
+						each_blocks[i].d(1);
+					}
+
+					each_blocks.length = each_value_1.length;
+				}
+			},
+			d: function destroy(detaching) {
+				if (detaching) {
+					detach_dev(div);
+				}
+
+				destroy_each(each_blocks, detaching);
+			}
+		};
+
+		dispatch_dev("SvelteRegisterBlock", {
+			block,
+			id: create_if_block_1.name,
+			type: "if",
+			source: "(372:20) {#if c.docIds?.length}",
+			ctx
+		});
+
+		return block;
+	}
+
+	// (374:24) {#each c.docIds as doc}
+	function create_each_block_1(ctx) {
+		let button;
+		let t0;
+		let t1_value = /*doc*/ ctx[47].title + "";
+		let t1;
+		let t2;
+		let mounted;
+		let dispose;
+
+		function click_handler_7() {
+			return /*click_handler_7*/ ctx[30](/*doc*/ ctx[47]);
+		}
+
+		const block = {
+			c: function create() {
+				button = element("button");
+				t0 = text("Open \"");
+				t1 = text(t1_value);
+				t2 = text("\"\n                          ");
+				attr_dev(button, "class", "btn btn-sm btn-outline-info me-1");
+				add_location(button, file, 374, 26, 13743);
+			},
+			m: function mount(target, anchor) {
+				insert_dev(target, button, anchor);
+				append_dev(button, t0);
+				append_dev(button, t1);
+				append_dev(button, t2);
+
+				if (!mounted) {
+					dispose = listen_dev(button, "click", click_handler_7, false, false, false, false);
+					mounted = true;
+				}
+			},
+			p: function update(new_ctx, dirty) {
+				ctx = new_ctx;
+				if (dirty[0] & /*chatMessages*/ 1024 && t1_value !== (t1_value = /*doc*/ ctx[47].title + "")) set_data_dev(t1, t1_value);
+			},
+			d: function destroy(detaching) {
+				if (detaching) {
+					detach_dev(button);
+				}
+
+				mounted = false;
+				dispose();
+			}
+		};
+
+		dispatch_dev("SvelteRegisterBlock", {
+			block,
+			id: create_each_block_1.name,
+			type: "each",
+			source: "(374:24) {#each c.docIds as doc}",
+			ctx
+		});
+
+		return block;
+	}
+
+	// (361:10) {#each chatMessages as c}
 	function create_each_block(ctx) {
 		let div;
 		let t;
 		let div_class_value;
 
 		function select_block_type_2(ctx, dirty) {
-			if (/*c*/ ctx[31].role === 'user') return create_if_block;
-			if (/*c*/ ctx[31].role === 'assistant') return create_if_block_1;
+			if (/*c*/ ctx[44].role === 'user') return create_if_block;
+			return create_else_block;
 		}
 
 		let current_block_type = select_block_type_2(ctx);
-		let if_block = current_block_type && current_block_type(ctx);
+		let if_block = current_block_type(ctx);
 
 		const block = {
 			c: function create() {
 				div = element("div");
-				if (if_block) if_block.c();
+				if_block.c();
 				t = space();
 
-				attr_dev(div, "class", div_class_value = /*c*/ ctx[31].role === 'user'
+				attr_dev(div, "class", div_class_value = /*c*/ ctx[44].role === 'user'
 				? 'text-end mb-2'
 				: 'text-start mb-2');
 
-				add_location(div, file, 279, 10, 9706);
+				add_location(div, file, 361, 12, 13025);
 			},
 			m: function mount(target, anchor) {
 				insert_dev(target, div, anchor);
-				if (if_block) if_block.m(div, null);
+				if_block.m(div, null);
 				append_dev(div, t);
 			},
 			p: function update(ctx, dirty) {
 				if (current_block_type === (current_block_type = select_block_type_2(ctx)) && if_block) {
 					if_block.p(ctx, dirty);
 				} else {
-					if (if_block) if_block.d(1);
-					if_block = current_block_type && current_block_type(ctx);
+					if_block.d(1);
+					if_block = current_block_type(ctx);
 
 					if (if_block) {
 						if_block.c();
@@ -6242,7 +6431,7 @@ var app = (function () {
 					}
 				}
 
-				if (dirty[0] & /*chatMessages*/ 512 && div_class_value !== (div_class_value = /*c*/ ctx[31].role === 'user'
+				if (dirty[0] & /*chatMessages*/ 1024 && div_class_value !== (div_class_value = /*c*/ ctx[44].role === 'user'
 				? 'text-end mb-2'
 				: 'text-start mb-2')) {
 					attr_dev(div, "class", div_class_value);
@@ -6253,9 +6442,7 @@ var app = (function () {
 					detach_dev(div);
 				}
 
-				if (if_block) {
-					if_block.d();
-				}
+				if_block.d();
 			}
 		};
 
@@ -6263,7 +6450,7 @@ var app = (function () {
 			block,
 			id: create_each_block.name,
 			type: "each",
-			source: "(279:8) {#each chatMessages as c, i}",
+			source: "(361:10) {#each chatMessages as c}",
 			ctx
 		});
 
@@ -6273,6 +6460,7 @@ var app = (function () {
 	function create_fragment(ctx) {
 		let link;
 		let t0;
+		let div15;
 		let header;
 		let h1;
 		let t2;
@@ -6281,7 +6469,7 @@ var app = (function () {
 		let t3_value = (/*darkMode*/ ctx[4] ? 'Light Mode' : 'Dark Mode') + "";
 		let t3;
 		let t4;
-		let div13;
+		let div14;
 		let div8;
 		let div2;
 		let ul;
@@ -6304,31 +6492,36 @@ var app = (function () {
 		let t15;
 		let input1;
 		let t16;
-		let textarea;
 		let t17;
 		let div4;
 		let button2;
 		let t19;
 		let button3;
 		let t21;
+		let textarea;
+		let t22;
 		let div7;
 		let div6;
-		let t22;
-		let div12;
-		let div11;
-		let h5;
-		let t24;
+		let raw_value = marked.parse(/*content*/ ctx[1] || '') + "";
+		let t23;
 		let div9;
-		let t25;
-		let div10;
-		let input2;
+		let t24;
+		let div13;
+		let div12;
+		let h5;
 		let t26;
+		let div10;
+		let t27;
+		let div11;
+		let input2;
+		let t28;
 		let button4;
 		let mounted;
 		let dispose;
-		let if_block0 = /*activeTab*/ ctx[7] === 'all' && create_if_block_4(ctx);
-		let if_block1 = /*activeTab*/ ctx[7] === 'search' && create_if_block_2(ctx);
-		let each_value = ensure_array_like_dev(/*chatMessages*/ ctx[9]);
+		let if_block0 = /*activeTab*/ ctx[8] === 'all' && create_if_block_5(ctx);
+		let if_block1 = /*activeTab*/ ctx[8] === 'search' && create_if_block_3(ctx);
+		let if_block2 = /*dirty*/ ctx[7] && create_if_block_2(ctx);
+		let each_value = ensure_array_like_dev(/*chatMessages*/ ctx[10]);
 		let each_blocks = [];
 
 		for (let i = 0; i < each_value.length; i += 1) {
@@ -6339,6 +6532,7 @@ var app = (function () {
 			c: function create() {
 				link = element("link");
 				t0 = space();
+				div15 = element("div");
 				header = element("header");
 				h1 = element("h1");
 				h1.textContent = "My Notes";
@@ -6347,7 +6541,7 @@ var app = (function () {
 				button0 = element("button");
 				t3 = text(t3_value);
 				t4 = space();
-				div13 = element("div");
+				div14 = element("div");
 				div8 = element("div");
 				div2 = element("div");
 				ul = element("ul");
@@ -6376,7 +6570,7 @@ var app = (function () {
 				t15 = space();
 				input1 = element("input");
 				t16 = space();
-				textarea = element("textarea");
+				if (if_block2) if_block2.c();
 				t17 = space();
 				div4 = element("div");
 				button2 = element("button");
@@ -6385,131 +6579,139 @@ var app = (function () {
 				button3 = element("button");
 				button3.textContent = "Clear";
 				t21 = space();
+				textarea = element("textarea");
+				t22 = space();
 				div7 = element("div");
 				div6 = element("div");
-				t22 = space();
+				t23 = space();
+				div9 = element("div");
+				t24 = space();
+				div13 = element("div");
 				div12 = element("div");
-				div11 = element("div");
 				h5 = element("h5");
 				h5.textContent = "Chat with your notes";
-				t24 = space();
-				div9 = element("div");
+				t26 = space();
+				div10 = element("div");
 
 				for (let i = 0; i < each_blocks.length; i += 1) {
 					each_blocks[i].c();
 				}
 
-				t25 = space();
-				div10 = element("div");
+				t27 = space();
+				div11 = element("div");
 				input2 = element("input");
-				t26 = space();
+				t28 = space();
 				button4 = element("button");
 				button4.textContent = "Send";
 				attr_dev(link, "rel", "stylesheet");
 				attr_dev(link, "href", "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css");
-				add_location(link, file, 119, 0, 3594);
-				add_location(h1, file, 123, 2, 3843);
+				add_location(link, file, 211, 0, 6323);
+				attr_dev(h1, "class", "m-0");
+				add_location(h1, file, 218, 4, 6772);
 				attr_dev(button0, "class", "btn btn-outline-secondary");
-				add_location(button0, file, 127, 4, 3924);
+				add_location(button0, file, 222, 6, 6871);
 				attr_dev(div0, "class", "mb-0 text-end");
-				add_location(div0, file, 126, 2, 3892);
-				attr_dev(header, "class", "d-flex justify-content-between align-items-center px-3 py-2");
+				add_location(div0, file, 221, 4, 6837);
+				attr_dev(header, "class", "d-flex justify-content-between align-items-center px-3 py-2 app-header svelte-nbi03a");
 				toggle_class(header, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(header, "text-light", /*darkMode*/ ctx[4]);
-				add_location(header, file, 121, 0, 3703);
+				add_location(header, file, 216, 2, 6617);
 				attr_dev(a0, "href", "#");
 				attr_dev(a0, "class", "nav-link");
-				toggle_class(a0, "active", /*activeTab*/ ctx[7] === 'all');
+				toggle_class(a0, "active", /*activeTab*/ ctx[8] === 'all');
 				toggle_class(a0, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(a0, "text-light", /*darkMode*/ ctx[4]);
-				add_location(a0, file, 144, 10, 4614);
+				add_location(a0, file, 239, 12, 7613);
 				attr_dev(li0, "class", "nav-item");
-				add_location(li0, file, 143, 8, 4582);
+				add_location(li0, file, 238, 10, 7579);
 				attr_dev(a1, "href", "#");
 				attr_dev(a1, "class", "nav-link");
-				toggle_class(a1, "active", /*activeTab*/ ctx[7] === 'search');
+				toggle_class(a1, "active", /*activeTab*/ ctx[8] === 'search');
 				toggle_class(a1, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(a1, "text-light", /*darkMode*/ ctx[4]);
-				add_location(a1, file, 154, 10, 4940);
+				add_location(a1, file, 249, 12, 7959);
 				attr_dev(li1, "class", "nav-item");
-				add_location(li1, file, 153, 8, 4908);
+				add_location(li1, file, 248, 10, 7925);
 				attr_dev(ul, "class", "nav nav-tabs mb-2");
 				set_style(ul, "border-bottom", "none");
 				toggle_class(ul, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(ul, "text-light", /*darkMode*/ ctx[4]);
-				add_location(ul, file, 142, 6, 4462);
+				add_location(ul, file, 237, 8, 7457);
 				attr_dev(input0, "class", "form-control form-control-sm");
 				attr_dev(input0, "placeholder", "Search...");
-				add_location(input0, file, 167, 8, 5321);
+				add_location(input0, file, 262, 10, 8360);
 				attr_dev(button1, "class", "btn btn-sm btn-primary");
-				add_location(button1, file, 168, 8, 5425);
+				add_location(button1, file, 263, 10, 8466);
 				attr_dev(div1, "class", "input-group mb-2");
-				add_location(div1, file, 166, 6, 5282);
-				attr_dev(div2, "class", "col-2 border rounded p-2 d-flex flex-column overflow-auto svelte-1o218rd");
+				add_location(div1, file, 261, 8, 8319);
+				attr_dev(div2, "class", "col-panel file-list-panel border rounded p-2 d-flex flex-column min-0 svelte-nbi03a");
 				toggle_class(div2, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(div2, "text-light", /*darkMode*/ ctx[4]);
-				add_location(div2, file, 138, 4, 4295);
+				add_location(div2, file, 233, 6, 7279);
 				attr_dev(label, "for", "docTitle");
 				attr_dev(label, "class", "form-label");
 				toggle_class(label, "text-light", /*darkMode*/ ctx[4]);
-				add_location(label, file, 238, 8, 8137);
+				add_location(label, file, 322, 10, 11129);
 				attr_dev(input1, "id", "docTitle");
 				attr_dev(input1, "class", "form-control");
 				attr_dev(input1, "placeholder", "Enter title...");
 				toggle_class(input1, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(input1, "text-light", /*darkMode*/ ctx[4]);
-				add_location(input1, file, 239, 8, 8237);
+				add_location(input1, file, 323, 10, 11231);
 				attr_dev(div3, "class", "mb-2");
-				add_location(div3, file, 237, 6, 8110);
-				attr_dev(textarea, "class", "form-control flex-grow-1 svelte-1o218rd");
+				add_location(div3, file, 321, 8, 11100);
+				attr_dev(button2, "class", "btn btn-primary flex-grow-1 svelte-nbi03a");
+				add_location(button2, file, 332, 10, 11575);
+				attr_dev(button3, "class", "btn btn-secondary flex-grow-1 svelte-nbi03a");
+				add_location(button3, file, 333, 10, 11662);
+				attr_dev(div4, "class", "mt-2 d-flex gap-2");
+				add_location(div4, file, 331, 8, 11533);
+				attr_dev(textarea, "class", "form-control flex-grow-1 min-0 svelte-nbi03a");
 				set_style(textarea, "resize", "none");
 				set_style(textarea, "overflow", "auto");
-				set_style(textarea, "min-height", "0");
 				toggle_class(textarea, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(textarea, "text-light", /*darkMode*/ ctx[4]);
-				add_location(textarea, file, 248, 6, 8508);
-				attr_dev(button2, "class", "btn btn-primary flex-grow-1 svelte-1o218rd");
-				add_location(button2, file, 257, 8, 8804);
-				attr_dev(button3, "class", "btn btn-secondary flex-grow-1 svelte-1o218rd");
-				add_location(button3, file, 258, 8, 8889);
-				attr_dev(div4, "class", "mt-2 d-flex gap-2");
-				add_location(div4, file, 256, 6, 8764);
-				attr_dev(div5, "class", "col-5 d-flex flex-column border rounded p-2 svelte-1o218rd");
-				set_style(div5, "min-height", "0");
+				add_location(textarea, file, 337, 8, 11915);
+				attr_dev(div5, "class", "col-panel editor-panel border rounded p-2 d-flex flex-column min-0 svelte-nbi03a");
 				toggle_class(div5, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(div5, "text-light", /*darkMode*/ ctx[4]);
-				add_location(div5, file, 233, 4, 7926);
-				attr_dev(div6, "class", "flex-grow-1 overflow-auto svelte-1o218rd");
-				set_style(div6, "min-height", "0");
-				add_location(div6, file, 265, 6, 9194);
-				attr_dev(div7, "class", "col-5 border rounded p-2 d-flex flex-column svelte-1o218rd");
+				add_location(div5, file, 319, 6, 10948);
+				attr_dev(div6, "class", "flex-grow-1 overflow-auto min-0 svelte-nbi03a");
+				add_location(div6, file, 344, 8, 12306);
+				attr_dev(div7, "class", "col-panel preview-panel border rounded p-2 d-flex flex-column min-0 svelte-nbi03a");
 				toggle_class(div7, "bg-dark", /*darkMode*/ ctx[4]);
 				toggle_class(div7, "text-light", /*darkMode*/ ctx[4]);
-				add_location(div7, file, 263, 4, 9068);
-				attr_dev(div8, "class", "row flex-grow-1 mb-2 svelte-1o218rd");
-				set_style(div8, "min-height", "0");
-				set_style(div8, "height", "70%");
-				add_location(div8, file, 135, 2, 4192);
-				add_location(h5, file, 276, 6, 9520);
-				attr_dev(div9, "class", "chat-history mb-2 flex-grow-1 overflow-auto border rounded p-2 svelte-1o218rd");
-				set_style(div9, "max-height", "300px");
-				add_location(div9, file, 277, 6, 9556);
+				add_location(div7, file, 342, 6, 12153);
+				attr_dev(div8, "class", "top-row d-flex w-100 min-0 svelte-nbi03a");
+				add_location(div8, file, 231, 4, 7201);
+				attr_dev(div9, "class", "resizer svelte-nbi03a");
+				add_location(div9, file, 351, 4, 12471);
+				attr_dev(h5, "class", "mb-2");
+				add_location(h5, file, 356, 8, 12804);
+				attr_dev(div10, "class", "chat-history flex-grow-1 overflow-auto border rounded p-2 min-0 svelte-nbi03a");
+				add_location(div10, file, 359, 8, 12899);
 				attr_dev(input2, "class", "form-control");
 				attr_dev(input2, "placeholder", "Ask a question...");
-				add_location(input2, file, 310, 8, 10750);
+				add_location(input2, file, 389, 10, 14254);
 				attr_dev(button4, "class", "btn btn-primary");
-				add_location(button4, file, 311, 8, 10845);
-				attr_dev(div10, "class", "input-group mt-auto");
-				add_location(div10, file, 309, 6, 10708);
-				attr_dev(div11, "class", "col-12 border rounded p-2 d-flex flex-column");
-				toggle_class(div11, "bg-dark", /*darkMode*/ ctx[4]);
-				toggle_class(div11, "text-light", /*darkMode*/ ctx[4]);
-				add_location(div11, file, 274, 4, 9393);
-				attr_dev(div12, "class", "row");
-				set_style(div12, "height", "30%");
-				add_location(div12, file, 273, 2, 9351);
-				attr_dev(div13, "class", "container-fluid vh-100 d-flex flex-column p-2");
-				add_location(div13, file, 133, 0, 4081);
+				add_location(button4, file, 390, 10, 14398);
+				attr_dev(div11, "class", "input-group mt-2 flex-shrink-0");
+				add_location(div11, file, 388, 8, 14199);
+				attr_dev(div12, "class", "col-12 border rounded p-2 d-flex flex-column min-0 svelte-nbi03a");
+				toggle_class(div12, "bg-dark", /*darkMode*/ ctx[4]);
+				toggle_class(div12, "text-light", /*darkMode*/ ctx[4]);
+				add_location(div12, file, 355, 6, 12678);
+				attr_dev(div13, "class", "bottom-row d-flex w-100 min-0 svelte-nbi03a");
+				attr_dev(div13, "role", "region");
+				attr_dev(div13, "aria-label", "chat panel");
+				add_location(div13, file, 354, 4, 12590);
+				attr_dev(div14, "class", "flex-grow-1 d-flex flex-column svelte-nbi03a");
+				set_style(div14, "min-height", "0");
+				add_location(div14, file, 229, 2, 7079);
+				attr_dev(div15, "class", "container-fluid app-root p-2 svelte-nbi03a");
+				toggle_class(div15, "bg-dark", /*darkMode*/ ctx[4]);
+				toggle_class(div15, "text-light", /*darkMode*/ ctx[4]);
+				add_location(div15, file, 214, 0, 6518);
 			},
 			l: function claim(nodes) {
 				throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6517,15 +6719,16 @@ var app = (function () {
 			m: function mount(target, anchor) {
 				insert_dev(target, link, anchor);
 				insert_dev(target, t0, anchor);
-				insert_dev(target, header, anchor);
+				insert_dev(target, div15, anchor);
+				append_dev(div15, header);
 				append_dev(header, h1);
 				append_dev(header, t2);
 				append_dev(header, div0);
 				append_dev(div0, button0);
 				append_dev(button0, t3);
-				insert_dev(target, t4, anchor);
-				insert_dev(target, div13, anchor);
-				append_dev(div13, div8);
+				append_dev(div15, t4);
+				append_dev(div15, div14);
+				append_dev(div14, div8);
 				append_dev(div8, div2);
 				append_dev(div2, ul);
 				append_dev(ul, li0);
@@ -6551,50 +6754,56 @@ var app = (function () {
 				append_dev(div3, input1);
 				set_input_value(input1, /*title*/ ctx[0]);
 				append_dev(div5, t16);
-				append_dev(div5, textarea);
-				set_input_value(textarea, /*content*/ ctx[1]);
+				if (if_block2) if_block2.m(div5, null);
 				append_dev(div5, t17);
 				append_dev(div5, div4);
 				append_dev(div4, button2);
 				append_dev(div4, t19);
 				append_dev(div4, button3);
-				append_dev(div8, t21);
+				append_dev(div5, t21);
+				append_dev(div5, textarea);
+				set_input_value(textarea, /*content*/ ctx[1]);
+				append_dev(div8, t22);
 				append_dev(div8, div7);
 				append_dev(div7, div6);
-				div6.innerHTML = /*preview*/ ctx[2];
-				append_dev(div13, t22);
+				div6.innerHTML = raw_value;
+				append_dev(div14, t23);
+				append_dev(div14, div9);
+				append_dev(div14, t24);
+				append_dev(div14, div13);
 				append_dev(div13, div12);
-				append_dev(div12, div11);
-				append_dev(div11, h5);
-				append_dev(div11, t24);
-				append_dev(div11, div9);
+				append_dev(div12, h5);
+				append_dev(div12, t26);
+				append_dev(div12, div10);
 
 				for (let i = 0; i < each_blocks.length; i += 1) {
 					if (each_blocks[i]) {
-						each_blocks[i].m(div9, null);
+						each_blocks[i].m(div10, null);
 					}
 				}
 
-				append_dev(div11, t25);
-				append_dev(div11, div10);
-				append_dev(div10, input2);
-				set_input_value(input2, /*chatInput*/ ctx[8]);
-				append_dev(div10, t26);
-				append_dev(div10, button4);
+				append_dev(div12, t27);
+				append_dev(div12, div11);
+				append_dev(div11, input2);
+				set_input_value(input2, /*chatInput*/ ctx[9]);
+				append_dev(div11, t28);
+				append_dev(div11, button4);
 
 				if (!mounted) {
 					dispose = [
-						listen_dev(button0, "click", /*click_handler*/ ctx[15], false, false, false, false),
-						listen_dev(a0, "click", /*click_handler_1*/ ctx[16], false, false, false, false),
-						listen_dev(a1, "click", /*click_handler_2*/ ctx[17], false, false, false, false),
-						listen_dev(input0, "input", /*input0_input_handler*/ ctx[18]),
-						listen_dev(button1, "click", /*searchDocs*/ ctx[13], false, false, false, false),
-						listen_dev(input1, "input", /*input1_input_handler*/ ctx[22]),
-						listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[23]),
-						listen_dev(button2, "click", /*saveDoc*/ ctx[10], false, false, false, false),
-						listen_dev(button3, "click", /*click_handler_6*/ ctx[24], false, false, false, false),
-						listen_dev(input2, "input", /*input2_input_handler*/ ctx[25]),
-						listen_dev(button4, "click", /*sendChat*/ ctx[14], false, false, false, false)
+						listen_dev(button0, "click", /*click_handler*/ ctx[20], false, false, false, false),
+						listen_dev(a0, "click", /*click_handler_1*/ ctx[21], false, false, false, false),
+						listen_dev(a1, "click", /*click_handler_2*/ ctx[22], false, false, false, false),
+						listen_dev(input0, "input", /*input0_input_handler*/ ctx[23]),
+						listen_dev(button1, "click", /*searchDocs*/ ctx[15], false, false, false, false),
+						listen_dev(input1, "input", /*input1_input_handler*/ ctx[27]),
+						listen_dev(button2, "click", /*saveDoc*/ ctx[12], false, false, false, false),
+						listen_dev(button3, "click", /*click_handler_6*/ ctx[28], false, false, false, false),
+						listen_dev(textarea, "input", /*textarea_input_handler*/ ctx[29]),
+						listen_dev(div9, "mousedown", /*startResize*/ ctx[11], false, false, false, false),
+						listen_dev(input2, "input", /*input2_input_handler*/ ctx[31]),
+						listen_dev(input2, "keydown", /*keydown_handler*/ ctx[32], false, false, false, false),
+						listen_dev(button4, "click", /*sendChat*/ ctx[16], false, false, false, false)
 					];
 
 					mounted = true;
@@ -6611,8 +6820,8 @@ var app = (function () {
 					toggle_class(header, "text-light", /*darkMode*/ ctx[4]);
 				}
 
-				if (dirty[0] & /*activeTab*/ 128) {
-					toggle_class(a0, "active", /*activeTab*/ ctx[7] === 'all');
+				if (dirty[0] & /*activeTab*/ 256) {
+					toggle_class(a0, "active", /*activeTab*/ ctx[8] === 'all');
 				}
 
 				if (dirty[0] & /*darkMode*/ 16) {
@@ -6623,8 +6832,8 @@ var app = (function () {
 					toggle_class(a0, "text-light", /*darkMode*/ ctx[4]);
 				}
 
-				if (dirty[0] & /*activeTab*/ 128) {
-					toggle_class(a1, "active", /*activeTab*/ ctx[7] === 'search');
+				if (dirty[0] & /*activeTab*/ 256) {
+					toggle_class(a1, "active", /*activeTab*/ ctx[8] === 'search');
 				}
 
 				if (dirty[0] & /*darkMode*/ 16) {
@@ -6647,11 +6856,11 @@ var app = (function () {
 					set_input_value(input0, /*searchQuery*/ ctx[5]);
 				}
 
-				if (/*activeTab*/ ctx[7] === 'all') {
+				if (/*activeTab*/ ctx[8] === 'all') {
 					if (if_block0) {
 						if_block0.p(ctx, dirty);
 					} else {
-						if_block0 = create_if_block_4(ctx);
+						if_block0 = create_if_block_5(ctx);
 						if_block0.c();
 						if_block0.m(div2, t12);
 					}
@@ -6660,11 +6869,11 @@ var app = (function () {
 					if_block0 = null;
 				}
 
-				if (/*activeTab*/ ctx[7] === 'search') {
+				if (/*activeTab*/ ctx[8] === 'search') {
 					if (if_block1) {
 						if_block1.p(ctx, dirty);
 					} else {
-						if_block1 = create_if_block_2(ctx);
+						if_block1 = create_if_block_3(ctx);
 						if_block1.c();
 						if_block1.m(div2, null);
 					}
@@ -6697,6 +6906,17 @@ var app = (function () {
 					toggle_class(input1, "text-light", /*darkMode*/ ctx[4]);
 				}
 
+				if (/*dirty*/ ctx[7]) {
+					if (if_block2) ; else {
+						if_block2 = create_if_block_2(ctx);
+						if_block2.c();
+						if_block2.m(div5, t17);
+					}
+				} else if (if_block2) {
+					if_block2.d(1);
+					if_block2 = null;
+				}
+
 				if (dirty[0] & /*content*/ 2) {
 					set_input_value(textarea, /*content*/ ctx[1]);
 				}
@@ -6717,7 +6937,7 @@ var app = (function () {
 					toggle_class(div5, "text-light", /*darkMode*/ ctx[4]);
 				}
 
-				if (dirty[0] & /*preview*/ 4) div6.innerHTML = /*preview*/ ctx[2];
+				if (dirty[0] & /*content*/ 2 && raw_value !== (raw_value = marked.parse(/*content*/ ctx[1] || '') + "")) div6.innerHTML = raw_value;
 				if (dirty[0] & /*darkMode*/ 16) {
 					toggle_class(div7, "bg-dark", /*darkMode*/ ctx[4]);
 				}
@@ -6726,8 +6946,8 @@ var app = (function () {
 					toggle_class(div7, "text-light", /*darkMode*/ ctx[4]);
 				}
 
-				if (dirty[0] & /*chatMessages, darkMode*/ 528) {
-					each_value = ensure_array_like_dev(/*chatMessages*/ ctx[9]);
+				if (dirty[0] & /*chatMessages, darkMode, openDocById*/ 132112) {
+					each_value = ensure_array_like_dev(/*chatMessages*/ ctx[10]);
 					let i;
 
 					for (i = 0; i < each_value.length; i += 1) {
@@ -6738,7 +6958,7 @@ var app = (function () {
 						} else {
 							each_blocks[i] = create_each_block(child_ctx);
 							each_blocks[i].c();
-							each_blocks[i].m(div9, null);
+							each_blocks[i].m(div10, null);
 						}
 					}
 
@@ -6749,16 +6969,24 @@ var app = (function () {
 					each_blocks.length = each_value.length;
 				}
 
-				if (dirty[0] & /*chatInput*/ 256 && input2.value !== /*chatInput*/ ctx[8]) {
-					set_input_value(input2, /*chatInput*/ ctx[8]);
+				if (dirty[0] & /*chatInput*/ 512 && input2.value !== /*chatInput*/ ctx[9]) {
+					set_input_value(input2, /*chatInput*/ ctx[9]);
 				}
 
 				if (dirty[0] & /*darkMode*/ 16) {
-					toggle_class(div11, "bg-dark", /*darkMode*/ ctx[4]);
+					toggle_class(div12, "bg-dark", /*darkMode*/ ctx[4]);
 				}
 
 				if (dirty[0] & /*darkMode*/ 16) {
-					toggle_class(div11, "text-light", /*darkMode*/ ctx[4]);
+					toggle_class(div12, "text-light", /*darkMode*/ ctx[4]);
+				}
+
+				if (dirty[0] & /*darkMode*/ 16) {
+					toggle_class(div15, "bg-dark", /*darkMode*/ ctx[4]);
+				}
+
+				if (dirty[0] & /*darkMode*/ 16) {
+					toggle_class(div15, "text-light", /*darkMode*/ ctx[4]);
 				}
 			},
 			i: noop,
@@ -6767,13 +6995,12 @@ var app = (function () {
 				if (detaching) {
 					detach_dev(link);
 					detach_dev(t0);
-					detach_dev(header);
-					detach_dev(t4);
-					detach_dev(div13);
+					detach_dev(div15);
 				}
 
 				if (if_block0) if_block0.d();
 				if (if_block1) if_block1.d();
+				if (if_block2) if_block2.d();
 				destroy_each(each_blocks, detaching);
 				mounted = false;
 				run_all(dispose);
@@ -6801,9 +7028,49 @@ var app = (function () {
 		let darkMode = false;
 		let searchQuery = '';
 		let searchResults = [];
+		let savedTitle = "";
+		let savedContent = "";
+		let dirty = false;
 
 		// Active tab: "all" or "search"
 		let activeTab = 'all';
+
+		let isResizing = false;
+		let startY;
+		let startHeight;
+
+		function startResize(e) {
+			isResizing = true;
+			startY = e.clientY;
+			const topRow = document.querySelector(".top-row");
+			startHeight = topRow.offsetHeight;
+			document.addEventListener("mousemove", resize);
+			document.addEventListener("mouseup", stopResize);
+		}
+
+		function resize(e) {
+			if (!isResizing) return;
+			const containerHeight = document.querySelector(".container-fluid").offsetHeight;
+			const dy = e.clientY - startY;
+			const newTopHeight = startHeight + dy;
+
+			// Minimums: don't let them collapse completely
+			if (newTopHeight < 100 || newTopHeight > containerHeight - 100) return;
+
+			const topRow = document.querySelector(".top-row");
+			const bottomRow = document.querySelector(".bottom-row");
+			topRow.style.height = `${newTopHeight}px`;
+			bottomRow.style.height = `${containerHeight - newTopHeight - 8}px`; // account for resizer height
+
+			// Save height to localStorage
+			localStorage.setItem("topRowHeight", newTopHeight);
+		}
+
+		function stopResize() {
+			isResizing = false;
+			document.removeEventListener("mousemove", resize);
+			document.removeEventListener("mouseup", stopResize);
+		}
 
 		function toggleTheme() {
 			$$invalidate(4, darkMode = !darkMode);
@@ -6813,7 +7080,7 @@ var app = (function () {
 
 		async function loadDocs() {
 			const res = await fetch('/api/docs');
-			$$invalidate(3, docs = await res.json());
+			$$invalidate(2, docs = await res.json());
 
 			//docs = (await res.json()).sort((a,b)=>a.title.localeCompare(b.title));
 			console.log(docs);
@@ -6840,23 +7107,41 @@ var app = (function () {
 				clearEditor();
 				await loadDocs();
 			}
+
+			// Update saved state after successful save
+			$$invalidate(18, savedTitle = title);
+
+			$$invalidate(19, savedContent = content);
+		}
+
+		// Warn user if leaving with unsaved changes
+		function handleBeforeUnload(event) {
+			if (dirty) {
+				event.preventDefault();
+				event.returnValue = ""; // Required for Chrome + most browsers
+			}
 		}
 
 		function clearEditor() {
 			$$invalidate(0, title = '');
 			$$invalidate(1, content = '');
-			$$invalidate(2, preview = '');
-			selectedDocId = null;
+			preview = '';
+			$$invalidate(3, selectedDocId = null);
 		}
 
 		async function editDoc(doc) {
 			const res = await fetch(`/api/doc/${doc.id}`);
 			if (!res.ok) return;
 			const data = await res.json();
-			selectedDocId = data.id;
+			$$invalidate(3, selectedDocId = data.id);
 			$$invalidate(0, title = data.title);
 			$$invalidate(1, content = data.content);
 			updatePreview();
+
+			// set saved state to match loaded doc
+			$$invalidate(18, savedTitle = title);
+
+			$$invalidate(19, savedContent = content);
 		}
 
 		async function deleteDoc(doc) {
@@ -6866,7 +7151,7 @@ var app = (function () {
 		}
 
 		function updatePreview() {
-			$$invalidate(2, preview = marked.parse(content));
+			preview = marked.parse(content);
 			setTimeout(() => document.querySelectorAll('pre code').forEach(block => Prism$1.highlightElement(block)), 0);
 		}
 
@@ -6883,7 +7168,7 @@ var app = (function () {
 			$$invalidate(6, searchResults = (await res.json()).sort((a, b) => b.score - a.score));
 
 			//searchResults = (await res.json()).sort((a,b)=>b.score - a.score);
-			$$invalidate(7, activeTab = 'search');
+			$$invalidate(8, activeTab = 'search');
 		}
 
 		let chatInput = '';
@@ -6898,7 +7183,7 @@ var app = (function () {
 			if (!chatInput.trim()) return;
 
 			//chatMessages.push({ role: 'user', text: chatInput });
-			$$invalidate(9, chatMessages = [...chatMessages, { role: 'user', text: chatInput }]);
+			$$invalidate(10, chatMessages = [...chatMessages, { role: 'user', text: chatInput }]);
 
 			const res = await fetch('/api/chat', {
 				method: 'POST',
@@ -6910,13 +7195,47 @@ var app = (function () {
 			console.log(data);
 
 			//chatMessages.push({ role: 'assistant', text: data.answer });
-			$$invalidate(9, chatMessages = [...chatMessages, { role: 'assistant', text: data.answer }]);
+			$$invalidate(10, chatMessages = [
+				...chatMessages,
+				{
+					role: 'assistant',
+					text: data.answer,
+					docIds: data.docIds
+				}
+			]);
 
 			console.log(chatMessages);
-			$$invalidate(8, chatInput = '');
+			$$invalidate(9, chatInput = '');
 		}
 
-		onMount(loadDocs);
+		function openDocById(id) {
+			fetch(`/api/doc/${id}`).then(r => r.json()).then(d => {
+				$$invalidate(3, selectedDocId = d.id);
+				$$invalidate(0, title = d.title);
+				$$invalidate(1, content = d.content);
+				$$invalidate(7, dirty = false);
+			});
+		}
+
+		onMount(() => {
+			loadDocs();
+			window.addEventListener("beforeunload", handleBeforeUnload);
+			const savedHeight = localStorage.getItem("topRowHeight");
+
+			if (savedHeight) {
+				const container = document.querySelector(".container-fluid");
+				const containerHeight = container.offsetHeight;
+				const topRow = document.querySelector(".top-row");
+				const bottomRow = document.querySelector(".bottom-row");
+				topRow.style.height = `${savedHeight}px`;
+				bottomRow.style.height = `${containerHeight - savedHeight - 8}px`;
+			}
+		});
+
+		onDestroy(() => {
+			window.removeEventListener("beforeunload", handleBeforeUnload);
+		});
+
 		const writable_props = [];
 
 		Object.keys($$props).forEach(key => {
@@ -6927,12 +7246,12 @@ var app = (function () {
 
 		const click_handler_1 = e => {
 			e.preventDefault();
-			$$invalidate(7, activeTab = 'all');
+			$$invalidate(8, activeTab = 'all');
 		};
 
 		const click_handler_2 = e => {
 			e.preventDefault();
-			$$invalidate(7, activeTab = 'search');
+			$$invalidate(8, activeTab = 'search');
 		};
 
 		function input0_input_handler() {
@@ -6949,24 +7268,29 @@ var app = (function () {
 			$$invalidate(0, title);
 		}
 
+		const click_handler_6 = () => {
+			$$invalidate(0, title = '');
+			$$invalidate(1, content = '');
+			$$invalidate(3, selectedDocId = null);
+		};
+
 		function textarea_input_handler() {
 			content = this.value;
 			$$invalidate(1, content);
 		}
 
-		const click_handler_6 = () => {
-			$$invalidate(0, title = '');
-			$$invalidate(1, content = '');
-			currentDocId = null;
-		};
+		const click_handler_7 = doc => openDocById(doc.id);
 
 		function input2_input_handler() {
 			chatInput = this.value;
-			$$invalidate(8, chatInput);
+			$$invalidate(9, chatInput);
 		}
+
+		const keydown_handler = e => e.key === 'Enter' && sendChat();
 
 		$$self.$capture_state = () => ({
 			onMount,
+			onDestroy,
 			marked,
 			Prism: Prism$1,
 			title,
@@ -6977,10 +7301,20 @@ var app = (function () {
 			darkMode,
 			searchQuery,
 			searchResults,
+			savedTitle,
+			savedContent,
+			dirty,
 			activeTab,
+			isResizing,
+			startY,
+			startHeight,
+			startResize,
+			resize,
+			stopResize,
 			toggleTheme,
 			loadDocs,
 			saveDoc,
+			handleBeforeUnload,
 			clearEditor,
 			editDoc,
 			deleteDoc,
@@ -6988,43 +7322,62 @@ var app = (function () {
 			searchDocs,
 			chatInput,
 			chatMessages,
-			sendChat
+			sendChat,
+			openDocById
 		});
 
 		$$self.$inject_state = $$props => {
 			if ('title' in $$props) $$invalidate(0, title = $$props.title);
 			if ('content' in $$props) $$invalidate(1, content = $$props.content);
-			if ('preview' in $$props) $$invalidate(2, preview = $$props.preview);
-			if ('docs' in $$props) $$invalidate(3, docs = $$props.docs);
-			if ('selectedDocId' in $$props) selectedDocId = $$props.selectedDocId;
+			if ('preview' in $$props) preview = $$props.preview;
+			if ('docs' in $$props) $$invalidate(2, docs = $$props.docs);
+			if ('selectedDocId' in $$props) $$invalidate(3, selectedDocId = $$props.selectedDocId);
 			if ('darkMode' in $$props) $$invalidate(4, darkMode = $$props.darkMode);
 			if ('searchQuery' in $$props) $$invalidate(5, searchQuery = $$props.searchQuery);
 			if ('searchResults' in $$props) $$invalidate(6, searchResults = $$props.searchResults);
-			if ('activeTab' in $$props) $$invalidate(7, activeTab = $$props.activeTab);
-			if ('chatInput' in $$props) $$invalidate(8, chatInput = $$props.chatInput);
-			if ('chatMessages' in $$props) $$invalidate(9, chatMessages = $$props.chatMessages);
+			if ('savedTitle' in $$props) $$invalidate(18, savedTitle = $$props.savedTitle);
+			if ('savedContent' in $$props) $$invalidate(19, savedContent = $$props.savedContent);
+			if ('dirty' in $$props) $$invalidate(7, dirty = $$props.dirty);
+			if ('activeTab' in $$props) $$invalidate(8, activeTab = $$props.activeTab);
+			if ('isResizing' in $$props) isResizing = $$props.isResizing;
+			if ('startY' in $$props) startY = $$props.startY;
+			if ('startHeight' in $$props) startHeight = $$props.startHeight;
+			if ('chatInput' in $$props) $$invalidate(9, chatInput = $$props.chatInput);
+			if ('chatMessages' in $$props) $$invalidate(10, chatMessages = $$props.chatMessages);
 		};
 
 		if ($$props && "$$inject" in $$props) {
 			$$self.$inject_state($$props.$$inject);
 		}
 
+		$$self.$$.update = () => {
+			if ($$self.$$.dirty[0] & /*title, savedTitle, content, savedContent*/ 786435) {
+				// Whenever content or title changes, mark as dirty
+				$$invalidate(7, dirty = title !== savedTitle || content !== savedContent);
+			}
+		};
+
 		return [
 			title,
 			content,
-			preview,
 			docs,
+			selectedDocId,
 			darkMode,
 			searchQuery,
 			searchResults,
+			dirty,
 			activeTab,
 			chatInput,
 			chatMessages,
+			startResize,
 			saveDoc,
 			editDoc,
 			deleteDoc,
 			searchDocs,
 			sendChat,
+			openDocById,
+			savedTitle,
+			savedContent,
 			click_handler,
 			click_handler_1,
 			click_handler_2,
@@ -7033,9 +7386,11 @@ var app = (function () {
 			click_handler_4,
 			click_handler_5,
 			input1_input_handler,
-			textarea_input_handler,
 			click_handler_6,
-			input2_input_handler
+			textarea_input_handler,
+			click_handler_7,
+			input2_input_handler,
+			keydown_handler
 		];
 	}
 
