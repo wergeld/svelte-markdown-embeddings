@@ -1,0 +1,23 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "rollup -c rollup.config.mjs -w",
+    "build": "rollup -c rollup.config.mjs"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.8",
+    "marked": "^11.1.0",
+    "prismjs": "^1.30.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^3.29.4",
+    "rollup-plugin-css-only": "^4.5.5",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-svelte": "^7.2.0",
+    "svelte": "^4.2.0"
+  }
+}

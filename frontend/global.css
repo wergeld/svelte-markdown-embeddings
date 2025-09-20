@@ -1,0 +1,150 @@
+:root {
+  --bg: #ffffff;
+  --fg: #222222;
+  --accent: #4f46e5;
+  --editor-bg: #f9f9f9;
+  --editor-fg: #222;
+  --border: #ccc;
+  --code-bg: #f3f3f3;
+}
+
+[data-theme="dark"] {
+  --bg: #121212;
+  --fg: #e0e0e0;
+  --accent: #818cf8;
+  --editor-bg: #1e1e1e;
+  --editor-fg: #e0e0e0;
+  --border: #333;
+  --code-bg: #2a2a2a;
+}
+
+/* --- Full-page layout --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+#svelte {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* --- Header --- */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--editor-bg);
+  flex-shrink: 0;
+}
+
+/* --- Main three-panel layout --- */
+.main-container {
+  display: flex;
+  flex-direction: row; /* side by side */
+  flex: 1;             /* fill remaining space under header */
+  gap: 1rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  min-height: 0;       /* important for flex scroll */
+}
+
+.file-list-panel {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background-color: var(--editor-bg);
+  padding: 0.5rem;
+  overflow-y: auto;
+}
+
+.editor-panel, .preview-panel {
+  flex: 1; /* share remaining width */
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  background-color: var(--editor-bg);
+  min-height: 0; /* ensures children can scroll */
+}
+
+.editor-panel textarea {
+  flex: 1;
+  width: 100%;
+}
+
+.preview-panel {
+  overflow-y: auto;
+}
+
+/* Markdown preview styling */
+.preview-panel pre {
+  background-color: var(--code-bg);
+  padding: 0.5rem;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.preview-panel code {
+  font-family: monospace;
+  background-color: var(--code-bg);
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+}
+
+input, button {
+  font-family: inherit;
+}
+
+/* Dark mode for form controls */
+body.bg-dark .form-control {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+body.bg-dark .form-control:focus {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border-color: #818cf8 !important;
+  box-shadow: none;
+}
+
+body.bg-dark .list-group-item {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+body.bg-dark .list-group-item:hover {
+  background-color: #2a2a2a;
+}
+
+/* Ensure lastModified date is readable in dark mode */
+.list-group-item .last-modified.text-light {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+/* Ensure lastModified date is readable in dark mode */
+.list-group-item .text-muted.text-light {
+  color: rgba(255,255,255,0.7) !important;
+}
+
+/* Ensure score text is readable in dark mode */
+.list-group-item .score-text.text-light {
+  color: rgba(255,255,255,0.7) !important;
+}
