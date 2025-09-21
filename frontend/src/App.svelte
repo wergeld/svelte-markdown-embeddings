@@ -87,9 +87,6 @@
   function toggleTheme() {
     darkMode = !darkMode;
     updatePrismTheme();
-    // darkMode = !darkMode;
-    // document.body.classList.toggle('bg-dark', darkMode);
-    // document.body.classList.toggle('text-light', darkMode);
   }
 
   function updatePrismTheme() {
@@ -106,8 +103,6 @@
   async function loadDocs() {
     const res = await fetch('/api/docs');
     docs = (await res.json());
-    //docs = (await res.json()).sort((a,b)=>a.title.localeCompare(b.title));
-    console.log(docs);
   }
 
   async function saveDoc() {
@@ -128,7 +123,6 @@
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(docPayload)
-      //body: JSON.stringify({title, content})
     });
     if(res.ok) { clearEditor(); await loadDocs(); }
 
@@ -172,7 +166,6 @@
 
   function updatePreview() {
     preview = parseMarkdown(content);
-    //setTimeout(()=>document.querySelectorAll('pre code').forEach(block=>Prism.highlightElement(block)),0);
   }
   async function searchDocs() {
     if (!searchQuery) return;
@@ -188,7 +181,7 @@
 
   let chatInput = '';
   let chatMessages = [];
-  
+
   async function sendChat() {
     if (!chatInput.trim()) return;
     let query = chatInput;
@@ -197,44 +190,63 @@
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ query: query })
+      body: JSON.stringify({ query })
     });
     const data = await res.json();
-    console.log(data);
-    chatMessages = [...chatMessages, { role: 'assistant', text: data.answer, docIds: data.docIds }];
-    console.log(chatMessages);
+    // data.answer: assistant response with inline doc tags
+    // data.docs: array of retrieved docs/chunks
+    chatMessages = [...chatMessages, { role: 'assistant', text: data.answer, docIds: data.docs }];
   }
 
+  // Parses inline doc tags: <<DOC_ID:...>>
   function parseInlineDocs(text) {
-    // Split text by document reference tags
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:(.*?)(?:\s+SCORE:[\d.]+)?>>([\s\S]*?)<</DOC_ID>>/g;
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:(.*?)(?:\s+SCORE:[\d.]+)?>>(.*?)<<\/DOC_ID>>/gs;
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:([^>]+?)(?:\s+SCORE:[\d.]+)?>>([\s\S]*?)<<\/DOC_ID>>/g;
+    // regex = /<<DOC_ID:(\d+)\s+TITLE:([^>]+?)(?:\s+SCORE:[\d.]+)?>>([\s\S]*?)<</DOC_ID>>/g;
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:([^>]+?)(?:\s+SCORE:[\d.]+)?>>\s*([\s\S]*?)<<\/DOC_ID>>/g;
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:([^>]+?)(?:\s+SCORE:[\d.]+)?>>\n*([\s\S]*?)<<\/DOC_ID>>/g;
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:([^>\n]+?)(?:\s+SCORE:[\d.]+)?>>([\s\S]*?)<<\/DOC_ID>>/g;
+    //const regex = /<<DOC_ID:(\d+)\s+TITLE:([^>]+?)(?:\s+SCORE:[\d.]+)?>>([\s\S]*?)<\<\/DOC_ID>>/g;
+    const regex = /<<DOC_ID:(\d+)\s+TITLE:([^>]+?)(?:\s+SCORE:[\d.]+)?>>(.*?)(?=(<<DOC_ID:)|$)/gs;
+
     const parts = [];
-    const regex = /<<DOC_ID:(\d+) TITLE:(.*?)>>(.*?)<<\/DOC_ID>>/gs;
     let lastIndex = 0;
     let match;
+  
 
     while ((match = regex.exec(text)) !== null) {
       if (match.index > lastIndex) {
-        parts.push({ text: text.slice(lastIndex, match.index), doc: null });
+        parts.push({ text: text.slice(lastIndex, match.index) });
       }
-      parts.push({ text: match[3], doc: { id: +match[1], title: match[2] } });
+
+      parts.push({
+        text: match[3] ? match[3].trim() : '',
+        doc: { id: Number(match[1]), title: match[2] }
+      });
+
       lastIndex = regex.lastIndex;
     }
+
     if (lastIndex < text.length) {
-      parts.push({ text: text.slice(lastIndex), doc: null });
+      parts.push({ text: text.slice(lastIndex) });
     }
 
+    console.log(parts);
     return parts;
   }
 
-  function openDocById(id) {
-    fetch(`/api/doc/${id}`)
-      .then(r => r.json())
-      .then(d => {
-        selectedDocId = d.id;
-        title = d.title;
-        content = d.content;
-        dirty = false;
-      });
+  // Open document/chunk in editor
+  async function openDocById(id) {
+    const res = await fetch(`/api/doc/${id}`);
+    const data = await res.json();
+    selectedDocId = data.id;
+    title = data.title;
+    content = data.content;
+
+    // set saved state to match loaded doc
+    savedTitle = title;
+    savedContent = content;
   }
 
   onMount(() => {
@@ -257,6 +269,8 @@
   onDestroy(() => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
   });
+
+
 </script>
 
 <!-- Conditionally load Prism theme -->
@@ -414,46 +428,47 @@
       <div class="col-12 border rounded p-2 d-flex flex-column min-0" class:bg-dark={darkMode} class:text-light={darkMode}>
         <h5 class="mb-2">Chat with your notes</h5>
 
-        <!-- chat messages scroll only -->
-        <div class="chat-history flex-grow-1 overflow-auto border rounded p-2 min-0">
-          {#each chatMessages as c}
-            <div class={c.role === 'user' ? 'text-end mb-2' : 'text-start mb-2'}>
-              {#if c.role === 'user'}
-                <div class="p-2 border rounded d-inline-block"
-                    class:bg-primary={!darkMode} class:text-white={!darkMode}
-                    class:bg-dark={darkMode} class:text-light={darkMode}>
-                  <strong>You:</strong> {c.text}
-                </div>
-              {:else}
-                <div class="p-2 border rounded d-inline-block ...">
-                  <strong>Assistant:</strong>
-                    {#each parseInlineDocs(c.text) as part}
-                      {#if part.doc}
-                        <button class="btn btn-sm btn-outline-info me-1"
-                                on:click={() => openDocById(part.doc.id)}>
-                          {part.doc.title}
-                        </button>
-                        {@html marked.parse(part.text)}
-                      {:else}
-                        {@html marked.parse(part.text)}
-                      {/if}
-                    {/each}
-
-                  {#if c.docIds}
-                    <div class="mt-1">
-                      {#each c.docIds as doc}
-                        <button class="btn btn-sm btn-outline-info me-1" 
-                                on:click={() => openDocById(doc.id)}>
-                          Open "{doc.title}" <em>{doc.score}</em>
-                        </button>
-                      {/each}
-                    </div>
+        <!-- chat messages scroll only --><div class="chat-history flex-grow-1 overflow-auto border rounded p-2 min-0">
+        {#each chatMessages as c}
+          <div class={c.role === 'user' ? 'text-end mb-2' : 'text-start mb-2'}>
+            {#if c.role === 'user'}
+              <div class="p-2 border rounded d-inline-block"
+                  class:bg-primary={!darkMode} class:text-white={!darkMode}
+                  class:bg-dark={darkMode} class:text-light={darkMode}>
+                <strong>You:</strong> {c.text}
+              </div>
+            {:else}
+              <div class="p-2 border rounded d-inline-block"
+                  class:bg-light={!darkMode} class:text-dark={!darkMode}
+                  class:bg-dark={darkMode} class:text-light={darkMode}>
+                <strong>Assistant:</strong>
+                {#each parseInlineDocs(c.text) as part}
+                  {#if part.doc}
+                    <button class="btn btn-sm btn-outline-info me-1 mb-1"
+                            on:click={() => openDocById(part.doc.id)}>
+                      {part.doc.title}
+                    </button>
+                    {@html marked.parse(part.text)}
+                  {:else}
+                    {@html marked.parse(part.text)}
                   {/if}
-                </div>
-              {/if}
-            </div>
-          {/each}
-        </div>
+                {/each}
+
+                {#if c.docIds && c.docIds.length}
+                  <div class="mt-1">
+                    {#each c.docIds as doc}
+                      <button class="btn btn-sm btn-outline-success me-1"
+                              on:click={() => openDocById(doc.document_id)}>
+                        Open "{doc.title}" <em>{doc.finalScore.toFixed(3)}</em>
+                      </button>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          </div>
+        {/each}
+      </div>
 
         <!-- input pinned at bottom (not scrolled away) -->
         <div class="input-group mt-2 flex-shrink-0">
