@@ -291,22 +291,77 @@ sequenceDiagram
     B-->>F: Answer + docIds
     F-->>U: Show answer + clickable doc links
 ```
+## Hybrid Search and Chunking
+
+- **Vector Search:** Uses embeddings to find semantically similar content.  
+- **Keyword Search:** Uses SQLite FTS5 with `bm25` scoring to rank matches based on query terms.  
+- **Hybrid Score:** Weighted combination: `0.7 * vectorScore + 0.3 * keywordScore` (tunable).  
+- **Chunk Aggregation:** When documents are chunked, only the **highest scoring chunk per document** is returned, with distinct titles and IDs.  
+
+### Data Flow Diagram
+
+```mermaid
+flowchart TD
+    A[User Query / Chat Input] --> B[Hybrid Search]
+    B --> B1[Vector Search using Embeddings]
+    B --> B2[Keyword Search using FTS5]
+    B1 --> C[Combine Scores: vectorScore + keywordScore]
+    B2 --> C
+    C --> D[Retrieve Top-K Documents / Aggregate by Title]
+    D --> E[Build LLM Prompt with Inline Document References]
+    E --> F[Ollama LLM Chat Model]
+    F --> G[AI Response with Footnote-Style Inline Document Links]
+    G --> H[Frontend]
+    H --> H1[Render Markdown / Syntax Highlighting]
+    H --> H2[Clickable Buttons to Open Relevant Documents]
+```
 
 ---
 
 ## 🗄️ Database Schema
 
-### Table Definition
+### Documents Table
 
 ```sql
-CREATE TABLE documents (
+CREATE TABLE IF NOT EXISTS documents (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
-    embedding TEXT NOT NULL,
+    embedding TEXT NOT NULL, -- JSON array of floats
     lastModified TEXT NOT NULL
 );
 ```
+### Document Chunks Table
+
+```sql
+  CREATE TABLE IF NOT EXISTS document_chunks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    document_id INTEGER NOT NULL,
+    chunk_index INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    embedding TEXT NOT NULL,
+    FOREIGN KEY(document_id) REFERENCES documents(id) ON DELETE CASCADE
+  );
+```
+
+### FTS5 Table
+
+```sql
+CREATE VIRTUAL TABLE IF NOT EXISTS documents_fts
+USING fts5(title, content, content_rowid = 'id');
+```
+
+### FTS5 Chunks Table
+
+```sql
+CREATE VIRTUAL TABLE IF NOT EXISTS document_chunks_fts
+USING fts5(content, content_rowid = 'id');
+```
+**Notes:**
+
+* Each document can be split into multiple chunks if needed for performance.
+* Embeddings are stored as JSON arrays of floats in the `embedding` column.
+
 
 ### Columns
 
@@ -324,6 +379,36 @@ CREATE TABLE documents (
 * **lastModified** → ISO8601 string (`2025-09-20T18:55:33.123Z`)
 
 ---
+
+## Hybrid Search and Chunking
+
+* **Vector Search:** Uses embeddings to find semantically similar content.
+* **Keyword Search:** Uses SQLite FTS5 with `bm25` scoring to rank matches based on query terms.
+* **Hybrid Score:** Weighted combination: `0.7 * vectorScore + 0.3 * keywordScore` (tunable).
+* **Chunk Aggregation:** When documents are chunked, only the **highest scoring chunk per document** is returned, with distinct titles and IDs.
+
+---
+
+## Performance Notes
+
+| Feature              | Notes                                                                                   |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| Embedding generation | Per document, can be slow on very large documents; consider chunking for large datasets |
+| FTS5 search          | Fast for keyword lookups                                                                |
+| Hybrid search        | Combines semantic and keyword search; balances accuracy and speed                       |
+| LLM chat             | Requires Ollama model to be loaded locally; prompt size can affect latency              |
+
+---
+
+## Frontend Notes
+
+* In-line document references are rendered as **footnote-style buttons** in AI responses.
+* Clicking a button opens the document in the editor for viewing or editing.
+* Supports dark mode and light mode themes for PrismJS code highlighting.
+
+---
+
+
 
 ## 🔄 Migration Note: JSON → BLOB for Embeddings
 
@@ -455,3 +540,11 @@ const floatArray = new Float32Array(row.embedding.buffer, row.embedding.byteOffs
 * Switch to **BLOB** if storing **tens of thousands of docs** or scaling search speed.
 
 ---
+
+## References
+
+* [PrismJS Syntax Highlighting](https://prismjs.com/)
+* [Marked Markdown Parser](https://marked.js.org/)
+* [Ollama LLM API](https://ollama.com/docs)
+* [SQLite FTS5](https://www.sqlite.org/fts5.html)
+
