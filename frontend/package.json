@@ -8,6 +8,7 @@
   "dependencies": {
     "bootstrap": "^5.3.8",
     "marked": "^11.1.0",
+    "marked-highlight": "2.2.2",
     "prismjs": "^1.30.0"
   },
   "devDependencies": {

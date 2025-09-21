@@ -125,41 +125,53 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
   console.log(`API + frontend serving at http://localhost:${PORT}`);
   console.log(`Using Ollama model: ${OLLAMA_MODEL}`);
+  console.log(`Using Ollama model: ${OLLAMA_MODEL_CHAT}`);
 });
 
 // --- Chat with notes ---
 app.post('/api/chat', async (req, res) => {
-  const { question, topK = 5 } = req.body || {};
-  if (!question) return res.status(400).send('question required');
+  const { query, topK = 1 } = req.body;
+  if (!query) return res.status(400).send('query required');
 
   try {
-    // 1. Get embedding for the question
-    const qEmb = await getEmbedding(question);
+    // Get embedding for query
+    const qEmb = await getEmbedding(query);
 
-    // 2. Load all documents with embeddings
+    // Retrieve all docs and compute similarity
     const rows = db.prepare('SELECT id, title, content, embedding FROM documents').all();
+    const scored = rows.map(r => {
+      const emb = JSON.parse(r.embedding);
+      return { id: r.id, title: r.title, content: r.content, score: cosineSimilarity(emb, qEmb) };
+    }).sort((a,b) => b.score - a.score)
+      .slice(0, Math.max(1, Math.min(50, topK)));
 
-    // 3. Compute similarity and get top K
-    const scored = rows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      content: row.content,
-      score: cosineSimilarity(qEmb, JSON.parse(row.embedding))
-    }));
-    const topDocs = scored.sort((a, b) => b.score - a.score).slice(0, topK);
-  
-    let contextText = topDocs.map(d => `DOC_ID:${d.id} TITLE:${d.title}\n${d.content}`).join('\n\n');
+    // Log title and score
+    scored.forEach(item => {
+      console.log(`${item.title}: ${item.score}`);
+    });
 
+    // Build context with inline doc reference tags
+    const contextText = scored
+      .map(d => `<<DOC_ID:${d.id} TITLE:${d.title} SCORE:${d.score}>>\n${d.content}\n<</DOC_ID>>`)
+      .join('\n\n');
+
+    // Prompt for the LLM
     const prompt = `
-You are an assistant. Answer the question using ONLY the provided documents.
-Indicate the DOC_IDs you used in your answer, e.g., "Used DOC_ID: 3 TITLE: My Document" for reference.
+You are an assistant. Answer the user's question using ONLY the provided documents.
+Whenever you use content from a document, you MUST wrap it exactly like this:
+
+<<DOC_ID:3 TITLE:My Note SCORE:0.45>>...<</DOC_ID>>
+
+- Replace "3" with the document ID, "My Note" with the document title, and 0.45 with the document score.
+- Do not fabricate document titles or content.
+- Only include information present in the documents.
+- Preserve the inline tags in your answer so the frontend can parse them.
 
 Context:
 ${contextText}
 
-Question: ${question}
+Question: ${query}
 `;
-
 
     // 5. Send prompt to Ollama LLM
     const resp = await axios.post('http://localhost:11434/api/chat', {
@@ -170,19 +182,22 @@ Question: ${question}
           "content": prompt
         }
       ],
-      max_tokens: 300000,
-      "stream": false
+      "stream": false,
+      "options": {
+        "seed": 101,
+        "temperature": 0.2
+      }
     });
 
-    console.log(prompt);
-    console.log(resp.data);
+    // console.log(prompt);
+    // console.log(resp.data.message.content);
 
     const response = resp.data?.message.content || 'No response';
     //res.json({ answer, sources: scored.map(r => ({ id: r.id, title: r.title, score: r.score })) });
     // Return both answer and the doc IDs
     res.json({
       answer: response, // or response.data.choices[0].text depending on Ollama API
-      docIds: topDocs.map(d => ({ id: d.id, title: d.title }))
+      docIds: scored.map(d => ({ id: d.id, title: d.title, score: d.score }))
     });
 
   } catch (err) {

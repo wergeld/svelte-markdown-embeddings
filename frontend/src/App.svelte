@@ -1,13 +1,36 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { marked } from 'marked';
+  import { marked  } from 'marked';
+  import { markedHighlight } from "marked-highlight";
   import Prism from 'prismjs';
-  import 'prismjs/themes/prism.css';
+  import "prismjs/components/prism-markup-templating.js";
+  import 'prismjs/themes/prism.css'; // Light mode
+  import 'prismjs/themes/prism-okaidia.css'; // Dark mode
+  import 'prismjs/components/prism-dotnet.js';
   import 'prismjs/components/prism-javascript.js';
+  import 'prismjs/components/prism-powershell.js';
+  import 'prismjs/components/prism-python.js';
+  import 'prismjs/components/prism-r.js';
+
+  let darkMode = false;
+  marked.use(markedHighlight({
+    langPrefix: 'language-', // This is the default, but good to be explicit
+    highlight(code, lang) {
+      if (Prism.languages[lang]) {
+        return Prism.highlight(code, Prism.languages[lang], lang);
+      }
+      // Fallback if the language is not found
+      return code;
+    }
+  }));
+
+  function parseMarkdown(text) {
+    return marked.parse(text);
+  }
 
   let title = '', content = '', preview = '';
   let docs = [], selectedDocId = null;
-  let darkMode = false;
+  
 
   let searchQuery = '';
   let searchResults = [];
@@ -63,8 +86,21 @@
 
   function toggleTheme() {
     darkMode = !darkMode;
-    document.body.classList.toggle('bg-dark', darkMode);
-    document.body.classList.toggle('text-light', darkMode);
+    updatePrismTheme();
+    // darkMode = !darkMode;
+    // document.body.classList.toggle('bg-dark', darkMode);
+    // document.body.classList.toggle('text-light', darkMode);
+  }
+
+  function updatePrismTheme() {
+    const existing = document.getElementById("prism-theme");
+    if (existing) existing.remove();
+
+    const link = document.createElement("link");
+    link.id = "prism-theme";
+    link.rel = "stylesheet";
+    link.href = darkMode ? "/prism-dark.css" : "/prism-light.css";
+    document.head.appendChild(link);
   }
 
   async function loadDocs() {
@@ -135,10 +171,9 @@
   }
 
   function updatePreview() {
-    preview = marked.parse(content);
-    setTimeout(()=>document.querySelectorAll('pre code').forEach(block=>Prism.highlightElement(block)),0);
+    preview = parseMarkdown(content);
+    //setTimeout(()=>document.querySelectorAll('pre code').forEach(block=>Prism.highlightElement(block)),0);
   }
-
   async function searchDocs() {
     if (!searchQuery) return;
     const res = await fetch('http://localhost:3000/api/search', {
@@ -148,33 +183,47 @@
     });
     if (!res.ok) return;
     searchResults = (await res.json()).sort((a,b)=>b.score - a.score);
-    //searchResults = (await res.json()).sort((a,b)=>b.score - a.score);
     activeTab = 'search';
   }
 
   let chatInput = '';
   let chatMessages = [];
   
-  // Example messages for testing
-    // let chatMessages = [
-    //   { role: 'user', text: 'What are the benefits for using RazorSvelte?' },
-     //  { role: 'assistant', text: 'RazorSvelte helps integrate Svelte into Razor pages for full-stack apps.' }
-    // ];
   async function sendChat() {
     if (!chatInput.trim()) return;
-    //chatMessages.push({ role: 'user', text: chatInput });
-    chatMessages = [...chatMessages, { role: 'user', text: chatInput }];
+    let query = chatInput;
+    chatInput = '';
+    chatMessages = [...chatMessages, { role: 'user', text: query }];
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ question: chatInput })
+      body: JSON.stringify({ query: query })
     });
     const data = await res.json();
     console.log(data);
-    //chatMessages.push({ role: 'assistant', text: data.answer });
     chatMessages = [...chatMessages, { role: 'assistant', text: data.answer, docIds: data.docIds }];
     console.log(chatMessages);
-    chatInput = '';
+  }
+
+  function parseInlineDocs(text) {
+    // Split text by document reference tags
+    const parts = [];
+    const regex = /<<DOC_ID:(\d+) TITLE:(.*?)>>(.*?)<<\/DOC_ID>>/gs;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({ text: text.slice(lastIndex, match.index), doc: null });
+      }
+      parts.push({ text: match[3], doc: { id: +match[1], title: match[2] } });
+      lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < text.length) {
+      parts.push({ text: text.slice(lastIndex), doc: null });
+    }
+
+    return parts;
   }
 
   function openDocById(id) {
@@ -189,6 +238,7 @@
   }
 
   onMount(() => {
+    updatePrismTheme();
     loadDocs();
     window.addEventListener("beforeunload", handleBeforeUnload);
 
@@ -209,6 +259,12 @@
   });
 </script>
 
+<!-- Conditionally load Prism theme -->
+<svelte:head>
+  <link rel="stylesheet" href="prism.css" disabled={darkMode}>
+  <link rel="stylesheet" href="prism-okaidia.css" disabled={!darkMode}>
+</svelte:head>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 <!-- NOTE: header moved INSIDE the container so it's part of the same flex layout -->
@@ -220,7 +276,7 @@
 
     <!-- Dark mode toggle -->
     <div class="mb-0 text-end">
-      <button class="btn btn-outline-secondary" on:click={()=>darkMode=!darkMode}>
+      <button class="btn btn-outline-secondary" on:click={toggleTheme}>
         {darkMode ? 'Light Mode' : 'Dark Mode'}
       </button>
     </div>
@@ -343,7 +399,9 @@
       <div class="col-panel preview-panel border rounded p-2 d-flex flex-column min-0"
           class:bg-dark={darkMode} class:text-light={darkMode}>
         <div class="flex-grow-1 overflow-auto min-0">
-          {@html marked.parse(content || '')}
+          <div class="preview-pane {darkMode ? 'dark' : 'light'}">
+            {@html parseMarkdown(content || '')}
+          </div>
         </div>
       </div>
     </div>
@@ -368,17 +426,29 @@
                 </div>
               {:else}
                 <div class="p-2 border rounded d-inline-block ...">
-                  <strong>Assistant:</strong> {@html marked.parse(c.text)}
-                    {#if c.docIds?.length}
-                      <div class="mt-1">
-                        {#each c.docIds as doc}
-                          <button class="btn btn-sm btn-outline-info me-1" 
-                                  on:click={() => openDocById(doc.id)}>
-                            Open "{doc.title}"
-                          </button>
-                        {/each}
-                      </div>
-                    {/if}
+                  <strong>Assistant:</strong>
+                    {#each parseInlineDocs(c.text) as part}
+                      {#if part.doc}
+                        <button class="btn btn-sm btn-outline-info me-1"
+                                on:click={() => openDocById(part.doc.id)}>
+                          {part.doc.title}
+                        </button>
+                        {@html marked.parse(part.text)}
+                      {:else}
+                        {@html marked.parse(part.text)}
+                      {/if}
+                    {/each}
+
+                  {#if c.docIds}
+                    <div class="mt-1">
+                      {#each c.docIds as doc}
+                        <button class="btn btn-sm btn-outline-info me-1" 
+                                on:click={() => openDocById(doc.id)}>
+                          Open "{doc.title}" <em>{doc.score}</em>
+                        </button>
+                      {/each}
+                    </div>
+                  {/if}
                 </div>
               {/if}
             </div>
@@ -393,8 +463,6 @@
       </div>
     </div>
   </div>
-
-
 </div>
 
 <style>
